@@ -68,8 +68,11 @@ logfile="$srcdir/$ARCHIVE/build.log"
 
 echo "*** patching sources ***" > "$logfile" 2>&1
 
-cd "$srcdir/$ARCHIVE"
-patch -p1 < $current_dir/$patchfile
+# zoltanff disable this patch to investigate if it is needed
+# Seems to be related to https://github.com/MailCore/mailcore2/issues/683
+#cd "$srcdir/$ARCHIVE"
+#patch -p1 < $current_dir/$patchfile
+
 # patch source files
 cd "$srcdir/$ARCHIVE/include"
 sed -E 's/\.\/makemd5 /.\/makemd5i386 /' < Makefile.am > Makefile.am.new
