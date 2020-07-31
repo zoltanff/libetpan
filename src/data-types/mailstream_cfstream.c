@@ -955,40 +955,50 @@ int mailstream_cfstream_set_ssl_enabled(mailstream * s, int ssl_enabled)
   
   cfstream_data = (struct mailstream_cfstream_data *) s->low->data;
   cfstream_data->ssl_enabled = ssl_enabled;
-  if (ssl_enabled) {
+  
+  // zoltanff forcing TLS and ignoring insecure options
+  if (true) {
     CFMutableDictionaryRef settings;
     
     settings = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-    switch (cfstream_data->ssl_level) {
-      case MAILSTREAM_CFSTREAM_SSL_LEVEL_NONE:
-        CFDictionarySetValue(settings, kCFStreamSSLLevel, kCFStreamSocketSecurityLevelNone);
-        break;
-      case MAILSTREAM_CFSTREAM_SSL_LEVEL_SSLv2:
-        CFDictionarySetValue(settings, kCFStreamSSLLevel, kCFStreamSocketSecurityLevelSSLv2);
-        break;
-      case MAILSTREAM_CFSTREAM_SSL_LEVEL_SSLv3:
-        CFDictionarySetValue(settings, kCFStreamSSLLevel, kCFStreamSocketSecurityLevelSSLv3);
-        break;
-      case MAILSTREAM_CFSTREAM_SSL_LEVEL_TLSv1:
-        CFDictionarySetValue(settings, kCFStreamSSLLevel, kCFStreamSocketSecurityLevelTLSv1);
-        break;
-      case MAILSTREAM_CFSTREAM_SSL_LEVEL_NEGOCIATED_SSL:
-        CFDictionarySetValue(settings, kCFStreamSSLLevel, kCFStreamSocketSecurityLevelNegotiatedSSL);
-        break;
-    }
     
-    if ((cfstream_data->ssl_certificate_verification_mask & MAILSTREAM_CFSTREAM_SSL_ALLOWS_EXPIRED_CERTIFICATES) != 0) {
-      CFDictionarySetValue(settings, kCFStreamSSLAllowsExpiredCertificates, kCFBooleanTrue);
-    }
-    if ((cfstream_data->ssl_certificate_verification_mask & MAILSTREAM_CFSTREAM_SSL_ALLOWS_EXPIRED_ROOTS) != 0) {
-      CFDictionarySetValue(settings, kCFStreamSSLAllowsExpiredRoots, kCFBooleanTrue);
-    }
-    if ((cfstream_data->ssl_certificate_verification_mask & MAILSTREAM_CFSTREAM_SSL_ALLOWS_ANY_ROOT) != 0) {
-      CFDictionarySetValue(settings, kCFStreamSSLAllowsAnyRoot, kCFBooleanTrue);
-    }
-    if ((cfstream_data->ssl_certificate_verification_mask & MAILSTREAM_CFSTREAM_SSL_DISABLE_VALIDATES_CERTIFICATE_CHAIN) != 0) {
-      CFDictionarySetValue(settings, kCFStreamSSLValidatesCertificateChain, kCFBooleanFalse);
-    }
+    
+//    switch (cfstream_data->ssl_level) {
+//      case MAILSTREAM_CFSTREAM_SSL_LEVEL_NONE:
+//        CFDictionarySetValue(settings, kCFStreamSSLLevel, kCFStreamSocketSecurityLevelNone);
+//        break;
+//      case MAILSTREAM_CFSTREAM_SSL_LEVEL_SSLv2:
+//        CFDictionarySetValue(settings, kCFStreamSSLLevel, kCFStreamSocketSecurityLevelSSLv2);
+//        break;
+//      case MAILSTREAM_CFSTREAM_SSL_LEVEL_SSLv3:
+//        CFDictionarySetValue(settings, kCFStreamSSLLevel, kCFStreamSocketSecurityLevelSSLv3);
+//        break;
+//      case MAILSTREAM_CFSTREAM_SSL_LEVEL_TLSv1:
+//        CFDictionarySetValue(settings, kCFStreamSSLLevel, kCFStreamSocketSecurityLevelTLSv1);
+//        break;
+//      case MAILSTREAM_CFSTREAM_SSL_LEVEL_NEGOCIATED_SSL:
+//        CFDictionarySetValue(settings, kCFStreamSSLLevel, kCFStreamSocketSecurityLevelNegotiatedSSL);
+//        break;
+//    }
+//    
+//    if ((cfstream_data->ssl_certificate_verification_mask & MAILSTREAM_CFSTREAM_SSL_ALLOWS_EXPIRED_CERTIFICATES) != 0) {
+//      CFDictionarySetValue(settings, kCFStreamSSLAllowsExpiredCertificates, kCFBooleanTrue);
+//    }
+//    if ((cfstream_data->ssl_certificate_verification_mask & MAILSTREAM_CFSTREAM_SSL_ALLOWS_EXPIRED_ROOTS) != 0) {
+//      CFDictionarySetValue(settings, kCFStreamSSLAllowsExpiredRoots, kCFBooleanTrue);
+//    }
+//    if ((cfstream_data->ssl_certificate_verification_mask & MAILSTREAM_CFSTREAM_SSL_ALLOWS_ANY_ROOT) != 0) {
+//      CFDictionarySetValue(settings, kCFStreamSSLAllowsAnyRoot, kCFBooleanTrue);
+//    }
+//    if ((cfstream_data->ssl_certificate_verification_mask & MAILSTREAM_CFSTREAM_SSL_DISABLE_VALIDATES_CERTIFICATE_CHAIN) != 0) {
+//      CFDictionarySetValue(settings, kCFStreamSSLValidatesCertificateChain, kCFBooleanFalse);
+//    }
+  
+    CFDictionarySetValue(settings, kCFStreamSSLLevel, kCFStreamSocketSecurityLevelTLSv1);
+    CFDictionarySetValue(settings, kCFStreamSSLAllowsExpiredCertificates, kCFBooleanFalse);
+    CFDictionarySetValue(settings, kCFStreamSSLAllowsExpiredRoots, kCFBooleanFalse);
+    CFDictionarySetValue(settings, kCFStreamSSLAllowsAnyRoot, kCFBooleanFalse);
+    CFDictionarySetValue(settings, kCFStreamSSLValidatesCertificateChain, kCFBooleanTrue);
     
     CFReadStreamSetProperty(cfstream_data->readStream, kCFStreamPropertySSLSettings, settings);
     CFWriteStreamSetProperty(cfstream_data->writeStream, kCFStreamPropertySSLSettings, settings);
